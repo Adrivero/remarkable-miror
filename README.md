@@ -18,8 +18,8 @@ Keep local PDF and RMDOC copies with a keyboard-driven terminal app. Sync automa
 | OS | Support |
 | --- | --- |
 | macOS | Primary platform; includes launch at login. |
-| Linux | Expected to support core syncing, but not yet tested. Launch at login is unavailable. |
-| Windows (native) | Not currently supported; the app requires Unix-specific file locking and filesystem operations. |
+| Linux | Expected to work, but not yet tested. Launch at login is unavailable. |
+| Windows | Not currently supported. |
 
 On Linux, the tablet's USB web interface must be reachable. Settings and state default to a macOS-style path on all platforms; use `--data-dir` to choose a Linux location:
 
