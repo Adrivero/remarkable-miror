@@ -6,12 +6,26 @@ Keep local PDF and RMDOC copies with a keyboard-driven terminal app. Sync automa
 
 ![reMarkable USB Mirror demo: connection, document export progress, completed archive, and settings](docs/demo.gif)
 
-*Actual app interface with simulated sample activity; no tablet or personal documents used. [Recreate the GIF](scripts/README.md).*
+*Actual app interface with simulated sample activity; no tablet or personal documents used.*
 
 - **USB workflow:** connect your tablet and enable its USB web interface.
 - **Automatic archiving:** sync on connection and every 15 minutes by default.
 - **PDF + RMDOC:** keep readable exports alongside native document archives.
 - **Visible progress:** watch transfers, inspect saved logs, and adjust settings from the terminal.
+
+## Supported operating systems
+
+| OS | Support |
+| --- | --- |
+| macOS | Primary platform; includes launch at login. |
+| Linux | Expected to support core syncing, but not yet tested. Launch at login is unavailable. |
+| Windows (native) | Not currently supported; the app requires Unix-specific file locking and filesystem operations. |
+
+On Linux, the tablet's USB web interface must be reachable. Settings and state default to a macOS-style path on all platforms; use `--data-dir` to choose a Linux location:
+
+```sh
+uv run remarkable-usb-mirror.py --data-dir ~/.local/share/remarkable-usb-mirror
+```
 
 ## Setup
 
@@ -23,7 +37,7 @@ cd remarkable-usb-mirror
 uv run remarkable-usb-mirror.py
 ```
 
-uv handles Python 3.12 or later and installs the dependencies declared inside the script automatically. No separate setup, activation, or package build is needed. The first run may need internet access to download Python and dependencies.
+uv handles Python 3.12 or later and installs the dependencies declared inside the script automatically.
 
 Connect the tablet with a USB data cable and enable its USB web interface. The default address is `10.11.99.1`. Press `p` to change settings.
 
@@ -63,7 +77,6 @@ Commands print JSON results. `status` exits nonzero if disconnected, `sync` if i
 - **Settings and state:** `~/Library/Application Support/reMarkable USB Mirror/`
 - **Inside the state folder:** `config.json`, `state.sqlite3`, `history/`, `conflicts/`, and `logs/` as needed.
 
-Use Settings to change the archive folder or other options. Changing the archive folder through Settings copies files and keeps the originals. Back up both the archive and state folder.
 
 To use a separate state folder, put `--data-dir` before the command:
 
@@ -75,16 +88,16 @@ This changes the settings and state location, not the document archive location.
 
 ## Troubleshooting
 
-If disconnected, check the USB cable, the tablet's USB web interface setting, and the address in Settings. Export availability depends on the tablet's firmware; check logs if a format is unavailable. After an interrupted sync, run it again to recover pending work.
+If the USB is connected and the app does not recongize the tablet, check that the device is reachable at `10.11.99.1` and in the tablet under `Settings > Storage` that the web interface is enabled
 
-This archives documents exposed by the USB interface, not the tablet's entire system.
+
 
 ## Project structure
 
 ```text
 remarkable-usb-mirror.py  Entry point and inline dependencies for uv
 src/                     Application code
-├── main.py              Command parsing and command execution
+├── main.py       `      Command parsing and command execution
 ├── config.py            Defaults, settings validation, and config.json
 ├── usb_client.py        USB HTTP requests and document downloads
 ├── scanner.py           Walks the tablet's document hierarchy
@@ -106,13 +119,11 @@ pytest.ini               Test configuration
 README.md                Setup and usage instructions
 ```
 
-`remarkable-usb-mirror.py` delegates to `main.py`, which opens the terminal interface or runs a single command. The interface uses `service.py` and `scheduler.py` for background work. Synchronization runs through `sync_engine.py`, using the USB client to read the tablet and the filesystem and database modules to maintain the local archive.
 
-The `__init__.py` files mark Python module directories. Document exports, settings, and archive state live in the locations listed above, outside the source tree by default. uv manages the runtime environment; there is no build or packaging directory.
 
 ## Tests
 
-Only needed when changing the code:
+Only needed when developing or contributing. Run all tests with:
 
 ```sh
 uv run --with pytest --with pytest-asyncio --with "httpx>=0.28,<1" --with "textual>=8.2,<9" --with "pypdf>=5,<7" python -m pytest
