@@ -1,13 +1,26 @@
 # reMarkable USB Mirror
 
-Archive reMarkable documents over USB as PDF and RMDOC files. Run `remarkable-miror.py` to open the terminal interface. The app only reads from the tablet; it keeps local copies of documents removed from the device and preserves previous revisions and detected local edits.
+**Your reMarkable notebooks, archived over USB.**
+
+Keep local PDF and RMDOC copies with a keyboard-driven terminal app. Sync automatically when your tablet connects, follow live progress, and preserve previous revisions and detected local edits. The app only reads from the tablet and retains local copies when documents disappear from the device.
+
+![reMarkable USB Mirror demo: connection, document export progress, completed archive, and settings](docs/demo.gif)
+
+*Actual app interface with simulated sample activity; no tablet or personal documents used. [Recreate the GIF](scripts/README.md).*
+
+- **USB workflow:** connect your tablet and enable its USB web interface.
+- **Automatic archiving:** sync on connection and every 15 minutes by default.
+- **PDF + RMDOC:** keep readable exports alongside native document archives.
+- **Visible progress:** watch transfers, inspect saved logs, and adjust settings from the terminal.
 
 ## Setup
 
-With `uv` installed, run this from the project folder:
+With [uv](https://docs.astral.sh/uv/) installed:
 
 ```sh
-uv run remarkable-miror.py
+git clone https://github.com/Adrivero/remarkable-usb-mirror.git
+cd remarkable-usb-mirror
+uv run remarkable-usb-mirror.py
 ```
 
 uv handles Python 3.12 or later and installs the dependencies declared inside the script automatically. No separate setup, activation, or package build is needed. The first run may need internet access to download Python and dependencies.
@@ -33,13 +46,13 @@ Settings include the archive folder, device address, intervals, export formats, 
 ## Commands
 
 ```sh
-uv run remarkable-miror.py status                 # Connectivity and archive statistics
-uv run remarkable-miror.py scan                   # List tablet documents
-uv run remarkable-miror.py sync --dry-run         # Preview downloads
-uv run remarkable-miror.py sync                   # Sync once and exit
-uv run remarkable-miror.py sync --force-refresh   # Download all selected formats again
-uv run remarkable-miror.py verify                 # Check hashes and preserve local edits
-uv run remarkable-miror.py --help
+uv run remarkable-usb-mirror.py status                 # Connectivity and archive statistics
+uv run remarkable-usb-mirror.py scan                   # List tablet documents
+uv run remarkable-usb-mirror.py sync --dry-run         # Preview downloads
+uv run remarkable-usb-mirror.py sync                   # Sync once and exit
+uv run remarkable-usb-mirror.py sync --force-refresh   # Download all selected formats again
+uv run remarkable-usb-mirror.py verify                 # Check hashes and preserve local edits
+uv run remarkable-usb-mirror.py --help
 ```
 
 Commands print JSON results. `status` exits nonzero if disconnected, `sync` if incomplete, and `verify` if files are missing or changed. Verification can save copies of edited files.
@@ -55,7 +68,7 @@ Use Settings to change the archive folder or other options. Changing the archive
 To use a separate state folder, put `--data-dir` before the command:
 
 ```sh
-uv run remarkable-miror.py --data-dir ./local-state status
+uv run remarkable-usb-mirror.py --data-dir ./local-state status
 ```
 
 This changes the settings and state location, not the document archive location.
@@ -69,7 +82,7 @@ This archives documents exposed by the USB interface, not the tablet's entire sy
 ## Project structure
 
 ```text
-remarkable-miror.py       Entry point and inline dependencies for uv
+remarkable-usb-mirror.py  Entry point and inline dependencies for uv
 src/                     Application code
 ├── main.py              Command parsing and command execution
 ├── config.py            Defaults, settings validation, and config.json
@@ -93,7 +106,7 @@ pytest.ini               Test configuration
 README.md                Setup and usage instructions
 ```
 
-`remarkable-miror.py` delegates to `main.py`, which opens the terminal interface or runs a single command. The interface uses `service.py` and `scheduler.py` for background work. Synchronization runs through `sync_engine.py`, using the USB client to read the tablet and the filesystem and database modules to maintain the local archive.
+`remarkable-usb-mirror.py` delegates to `main.py`, which opens the terminal interface or runs a single command. The interface uses `service.py` and `scheduler.py` for background work. Synchronization runs through `sync_engine.py`, using the USB client to read the tablet and the filesystem and database modules to maintain the local archive.
 
 The `__init__.py` files mark Python module directories. Document exports, settings, and archive state live in the locations listed above, outside the source tree by default. uv manages the runtime environment; there is no build or packaging directory.
 

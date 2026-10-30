@@ -24,7 +24,7 @@ def set_launch_at_login(enabled: bool, data_dir: Path, *, agents_dir: Path | Non
             path.unlink()
         return
     executable = str(Path(sys.executable).absolute())
-    command = [executable, str(Path(__file__).resolve().parent.parent / "remarkable-miror.py")]
+    command = [executable, str(Path(__file__).resolve().parent.parent / "remarkable-usb-mirror.py")]
     command += ["--data-dir", str(data_dir), "tui"]
     directory.mkdir(parents=True, exist_ok=True)
     data_dir.mkdir(parents=True, exist_ok=True)

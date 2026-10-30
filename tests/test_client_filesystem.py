@@ -150,7 +150,7 @@ def test_login_item_enable_disable(tmp_path, monkeypatch):
     launcher = Path(payload["ProgramArguments"][3])
     command = shlex.split(launcher.read_text().splitlines()[1].removeprefix("exec "))
     assert command[0] == str(Path(login.sys.executable).absolute())
-    assert command[1] == str(Path(login.__file__).resolve().parent.parent / "remarkable-miror.py")
+    assert command[1] == str(Path(login.__file__).resolve().parent.parent / "remarkable-usb-mirror.py")
     assert command[-1] == "tui"
     assert launcher.stat().st_mode & 0o100
     set_launch_at_login(False, tmp_path / "data", agents_dir=directory)
